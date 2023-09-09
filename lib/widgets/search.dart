@@ -1,5 +1,5 @@
-import 'package:assignment4/Models/model.dart';
-import 'package:assignment4/providers/provider.dart';
+import 'package:assignment4/providers/todo_provider.dart';
+import 'package:assignment4/widgets/todo_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -44,28 +44,58 @@ class ToDoSearchDeleget extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    List<ToDoModel> suggestions =
-        Provider.of<ToDosProvider>(context).search(query);
+    final suggestions = Provider.of<ToDoProvider>(context);
 
-    return Consumer<ToDosProvider>(
-      builder: (context, provider, child) => ListView.builder(
-          itemCount: suggestions.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-                title: Text(suggestions[index].title),
-                leading: Checkbox(
-                  value: suggestions[index].isDone,
-                  activeColor: const Color.fromARGB(255, 234, 201, 54),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(5.0),
+    return FutureBuilder(
+        future: suggestions.search(query),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text(snapshot.error.toString()),
+            );
+          } else if (snapshot.hasData) {
+            return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  return Dismissible(
+                    key: ValueKey(snapshot.data![index]),
+                    onDismissed: (direction) {
+                      suggestions.delete(snapshot.data![index].id!);
+                    },
+                    child: ToDoWidget(
+                      todoModel: snapshot.data![index],
                     ),
-                  ),
-                  onChanged: (value) {
-                    provider.toggle(provider.toDos.indexOf(suggestions[index]));
-                  },
-                ));
-          }),
-    );
+                  );
+                });
+          }
+          return const Center(
+            child: Text("No data"),
+          );
+        });
+
+    // return Consumer<ToDosProvider>(
+    //   builder: (context, provider, child) => ListView.builder(
+    //       itemCount: suggestions.length,
+    //       itemBuilder: (context, index) {
+    //         return ListTile(
+    //             title: Text(suggestions[index].title),
+    //             leading: Checkbox(
+    //               value: suggestions[index].isDone,
+    //               activeColor: const Color.fromARGB(255, 234, 201, 54),
+    //               shape: const RoundedRectangleBorder(
+    //                 borderRadius: BorderRadius.all(
+    //                   Radius.circular(5.0),
+    //                 ),
+    //               ),
+    //               onChanged: (value) {
+    //                 provider.toggle(provider.toDos.indexOf(suggestions[index]));
+    //               },
+    //             ));
+    //       }),
+    // );
   }
 }
