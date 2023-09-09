@@ -3,10 +3,11 @@ import 'package:assignment4/screens/login_page.dart';
 import 'package:assignment4/screens/todos_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'models/handler/shared_prefference_handler.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPreferencesHandler().init();
   runApp(const MyApp());
 }
 
@@ -21,17 +22,15 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => ToDoProvider()),
       ],
       child: FutureBuilder<bool>(
-        future: SharedPreferencesHandler.isUserLoggedIn(),
+        future: SharedPreferencesHandler().isUserLoggedIn(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // You can show a loading indicator here if needed
             return const CircularProgressIndicator();
           } else if (snapshot.hasError) {
             return Center(
               child: Text(snapshot.error.toString()),
             );
           } else if (snapshot.hasData) {
-            print("11111111 " + snapshot.data.toString());
             final bool isLoggedIn = snapshot.data!;
             return MaterialApp(
               routes: {

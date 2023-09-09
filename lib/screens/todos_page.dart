@@ -12,7 +12,8 @@ class ToDosPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future<String?> email = SharedPreferencesHandler.getEmailFromPreferences();
+    Future<String?> email =
+        SharedPreferencesHandler().getEmailFromPreferences();
     var provider = Provider.of<ToDoProvider>(context);
 
     return Scaffold(
@@ -54,8 +55,9 @@ class ToDosPage extends StatelessWidget {
                                 )),
                                 child: const Text("Add"),
                                 onPressed: () async {
-                                  String? email = await SharedPreferencesHandler
-                                      .getEmailFromPreferences();
+                                  String? email =
+                                      await SharedPreferencesHandler()
+                                          .getEmailFromPreferences();
                                   provider.add(ToDoModel(
                                     title: title,
                                     checkBox: false,
@@ -133,14 +135,8 @@ class ToDosPage extends StatelessWidget {
                     ),
                     TextButton(
                         onPressed: () async {
-                          bool test =
-                              await SharedPreferencesHandler.isUserLoggedIn();
-                          print("333333333 $test");
-                          await SharedPreferencesHandler
+                          await SharedPreferencesHandler()
                               .deleteEmailFromPreferences();
-                          bool test2 =
-                              await SharedPreferencesHandler.isUserLoggedIn();
-                          print("4444444444 $test2");
                           Navigator.pushReplacementNamed(context, Login.id);
                         },
                         child: const Text("Logout"))

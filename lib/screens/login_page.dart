@@ -61,9 +61,8 @@ class Login extends StatelessWidget {
               child: const Text("Login"),
               onPressed: () async {
                 if (k.currentState!.validate()) {
-                  await SharedPreferencesHandler.saveEmailToPreferences(email.text);
-                  bool test = await SharedPreferencesHandler.isUserLoggedIn();
-                  print("2222222222222 $test");
+                  await SharedPreferencesHandler()
+                      .saveEmailToPreferences(email.text);
                   Navigator.pushNamed(context, ToDosPage.id);
                 }
               },

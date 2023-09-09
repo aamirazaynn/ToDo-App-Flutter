@@ -43,7 +43,7 @@ class ToDoProvider extends ChangeNotifier {
 
   Future<List<ToDoModel>> search(String query) async {
     try {
-      final response = await ToDoLogic.getToDo();
+      final response = await ToDoLogic.getToDo()  as List<ToDoModel>;
       return response
           .where((element) =>
               element.title.toLowerCase().contains(query.toLowerCase()))

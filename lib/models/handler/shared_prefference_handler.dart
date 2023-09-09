@@ -1,27 +1,40 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesHandler {
-  static Future<void> saveEmailToPreferences(String email) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('email', email);
+  static final SharedPreferencesHandler _instance =
+      SharedPreferencesHandler._internal();
+
+  factory SharedPreferencesHandler() {
+    return _instance;
   }
 
-  static Future<String?> getEmailFromPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('email');
+  SharedPreferencesHandler._internal();
+
+  // Initialize SharedPreferences
+  late SharedPreferences _prefs;
+
+  Future<void> init() async {
+    _prefs = await SharedPreferences.getInstance();
   }
 
-  static Future<void> deleteEmailFromPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('email');
+  Future<void> saveEmailToPreferences(String email) async {
+    await _prefs.setString('email', email);
   }
 
-  static Future<bool> isUserLoggedIn() async {
-  String? email = await SharedPreferencesHandler.getEmailFromPreferences();
-  if (email != null && email.isNotEmpty) {
-    return true;
-  } else {
-    return false;
+  Future<String?> getEmailFromPreferences() async {
+    return _prefs.getString('email');
   }
-}
+
+  Future<void> deleteEmailFromPreferences() async {
+    await _prefs.remove('email');
+  }
+
+  Future<bool> isUserLoggedIn() async {
+    String? email = await getEmailFromPreferences();
+    if (email != null && email.isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
